@@ -296,12 +296,13 @@ function renderAuth(mode){
   const card = document.getElementById('authCard');
   const isLogin = mode==='login';
   card.innerHTML = `
-    <h2>${isLogin?'登录':'注册'}</h2>
+    <div style="display:flex;margin-bottom:16px">
+      <div style="flex:1;text-align:center;padding:8px;font-size:14px;font-weight:600;cursor:pointer;border-bottom:2px solid ${isLogin?'var(--ac)':'var(--bdr)'};color:${isLogin?'var(--tx)':'var(--tx3)'}" onclick="renderAuth('login')">登录</div>
+      <div style="flex:1;text-align:center;padding:8px;font-size:14px;font-weight:600;cursor:pointer;border-bottom:2px solid ${!isLogin?'var(--ac)':'var(--bdr)'};color:${!isLogin?'var(--tx)':'var(--tx3)'}" onclick="renderAuth('register')">注册</div></div>
     <div class="fg"><label>邮箱</label><input type="email" id="af_email" placeholder="your@email.com"></div>
     <div class="fg"><label>密码</label><input type="password" id="af_pw" placeholder="至少6位"></div>
     <div class="err" id="af_err"></div>
-    <button class="btn btn-w block mt8" onclick="doAuth('${mode}')">${isLogin?'登录':'注册'}</button>
-    <div class="switch" onclick="renderAuth('${isLogin?'register':'login'}')">${isLogin?'没有账号？点击注册':'已有账号？点击登录'}</div>`;
+    <button class="btn btn-w block mt8" onclick="doAuth('${mode}')">${isLogin?'登录':'注册'}</button>`;
 }
 
 async function doAuth(mode){
