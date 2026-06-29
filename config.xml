@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.inventory.manager" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>进销存管理</name>
+    <description>多店进销存管理系统 - 总店/分店/加盟店</description>
+    <author email="support@example.com" href="https://example.com">进销存团队</author>
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="Fullscreen" value="false" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#0a0c14" />
+    <preference name="StatusBarStyle" value="lightcontent" />
+    <preference name="loadUrlTimeoutValue" value="60000" />
+    <preference name="AndroidXEnabled" value="true" />
+    <preference name="GradlePluginKotlinEnabled" value="true" />
+    <platform name="android">
+        <preference name="android-minSdkVersion" value="22" />
+        <preference name="android-targetSdkVersion" value="34" />
+        <icon density="mdpi" src="res/icon/icon-48.png" />
+        <icon density="hdpi" src="res/icon/icon-72.png" />
+        <icon density="xhdpi" src="res/icon/icon-96.png" />
+        <icon density="xxhdpi" src="res/icon/icon-144.png" />
+        <icon density="xxxhdpi" src="res/icon/icon-192.png" />
+    </platform>
+</widget>
