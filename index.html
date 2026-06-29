@@ -3,56 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#0a0c14">
+<meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="进销存">
-<link rel="manifest" href="manifest.json">
-<title>进销存管理系统</title>
+<title>进销存系统</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0c14;--srf:#141725;--crd:#1a1e2e;--bdr:#252a3a;
-  --tx:#e2e4eb;--tx2:#888ca0;--tx3:#5a5e70;
-  --ac:#d4943a;--ac2:#b87a2a;--gr:#4a9e6c;--rd:#c54a4a;
+  --bg:#f5f5f7;--srf:#ffffff;--crd:#ffffff;--bdr:#e5e5ea;
+  --tx:#1c1c1e;--tx2:#6e6e73;--tx3:#aeaeb2;
+  --ac:#d4943a;--gr:#34c759;--rd:#ff3b30;--bl:#007aff;
   --mono:'JetBrains Mono',monospace;--r:8px;--rs:5px;
-  --btn-w:#ffffff;--btn-b:#d0e4f7;--btn-b2:#a8cce8;
   --nav:60px;--hd:50px;
 }
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-  background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased;
-  min-height:100dvh;padding-bottom:calc(var(--nav)+20px);
+  background:var(--bg);color:var(--tx);min-height:100dvh;
   overflow-x:hidden;
 }
-#app{max-width:640px;margin:0 auto;padding:0 16px}
+#app{max-width:640px;margin:0 auto;padding:0 16px;padding-bottom:calc(var(--nav)+20px)}
 
-/* login page */
-.login-wrap{
+/* auth page */
+.auth-wrap{
   display:flex;flex-direction:column;align-items:center;
-  justify-content:center;min-height:80dvh;gap:24px;padding:20px;
+  justify-content:center;min-height:90dvh;gap:20px;padding:20px;
 }
-.login-wrap .logo{font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--ac)}
-.login-wrap .sub{font-size:13px;color:var(--tx2)}
-.login-card{
+.auth-wrap .logo{font-size:26px;font-weight:700;color:var(--ac)}
+.auth-wrap .sub{font-size:12px;color:var(--tx2);text-align:center}
+.auth-card{
   background:var(--crd);border-radius:var(--r);padding:24px;
-  border:1px solid var(--bdr);width:100%;max-width:320px;
+  border:1px solid var(--bdr);width:100%;max-width:340px;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
 }
-.login-card .title{font-size:15px;font-weight:600;margin-bottom:16px;text-align:center}
+.auth-card h2{font-size:16px;font-weight:600;margin-bottom:16px;text-align:center}
+.auth-card .switch{font-size:12px;color:var(--ac);text-align:center;margin-top:12px;cursor:pointer}
+.auth-card .err{font-size:11px;color:var(--rd);text-align:center;margin-top:8px}
 
-/* bottom nav */
+/* nav */
 #nav{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:640px;height:var(--nav);
   background:var(--srf);border-top:1px solid var(--bdr);
   display:flex;z-index:100;border-radius:14px 14px 0 0;
-  box-shadow:0 -4px 24px rgba(0,0,0,.45);padding:0 6px;
+  box-shadow:0 -2px 12px rgba(0,0,0,.08);padding:0 6px;
 }
 #nav .t{
   flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;color:var(--tx3);font-size:10px;
-  cursor:pointer;transition:color .18s;gap:3px;
-  -webkit-tap-highlight-color:transparent;user-select:none;
+  cursor:pointer;transition:color .18s;gap:3px;user-select:none;
 }
 #nav .t.ac{color:var(--ac)}
 #nav .t svg{width:22px;height:22px}
@@ -61,37 +60,38 @@ body{
 .hd{
   position:sticky;top:0;z-index:50;display:flex;align-items:center;
   justify-content:space-between;height:var(--hd);padding:0 2px;
-  background:var(--bg);
+  background:var(--bg);border-bottom:1px solid var(--bdr);
 }
-.hd h1{font-size:17px;font-weight:600;letter-spacing:-.3px}
+.hd h1{font-size:17px;font-weight:600}
+.hd .right{display:flex;align-items:center;gap:6px}
 .hd .role{
   font-size:11px;padding:4px 12px;border-radius:20px;
-  background:var(--crd);border:1px solid var(--bdr);
-  color:var(--ac);cursor:pointer;font-family:var(--mono);font-weight:500;
+  background:#f5f5f7;border:1px solid var(--bdr);
+  color:var(--ac);font-family:var(--mono);font-weight:500;
 }
+.hd .logout-btn{font-size:11px;color:var(--rd);cursor:pointer;padding:4px 6px}
 
 /* cards */
 .cd{
   background:var(--crd);border-radius:var(--r);padding:14px;
   margin-bottom:10px;border:1px solid var(--bdr);
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
 }
 .cd-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .cd-h span{font-size:13px;font-weight:600;color:var(--tx)}
 .cd-h small{font-size:11px;color:var(--tx3)}
 
-/* stats */
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .st{
   background:var(--crd);border-radius:var(--r);padding:12px;
-  border:1px solid var(--bdr);
+  border:1px solid var(--bdr);box-shadow:0 1px 2px rgba(0,0,0,.04);
 }
 .st .v{font-size:22px;font-weight:700;font-family:var(--mono);color:var(--ac)}
 .st .l{font-size:10px;color:var(--tx3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
 
 /* table */
 .tbl{width:100%;border-collapse:collapse;font-size:12px}
-.tbl th{text-align:left;color:var(--tx3);font-weight:500;font-size:10px;
-  text-transform:uppercase;letter-spacing:.5px;padding:6px 4px;border-bottom:1px solid var(--bdr)}
+.tbl th{text-align:left;color:var(--tx3);font-weight:500;font-size:10px;padding:6px 4px;border-bottom:1px solid var(--bdr)}
 .tbl td{padding:8px 4px;border-bottom:1px solid var(--bdr);color:var(--tx);line-height:1.4}
 .tbl td.m{font-family:var(--mono);font-size:11px;color:var(--ac)}
 .tbl tr:last-child td{border-bottom:none}
@@ -100,48 +100,47 @@ body{
 .fg{margin-bottom:10px}
 .fg label{display:block;font-size:10px;color:var(--tx3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
 .fg input,.fg select,.fg textarea{
-  width:100%;padding:9px 12px;background:var(--srf);border:1px solid var(--bdr);
+  width:100%;padding:9px 12px;background:#f5f5f7;border:1px solid var(--bdr);
   border-radius:var(--rs);color:var(--tx);font-size:14px;font-family:inherit;
   outline:none;transition:border-color .15s;
 }
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--ac)}
+.fg input:focus,.fg select:focus{border-color:var(--ac)}
 .fg-row{display:flex;gap:8px}
 .fg-row .fg{flex:1}
 
-/* buttons - white & light blue */
+/* buttons */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;
   padding:8px 16px;border-radius:var(--rs);font-size:13px;font-weight:600;
   cursor:pointer;border:none;transition:all .15s;gap:6px;
-  -webkit-tap-highlight-color:transparent;font-family:inherit;
-  min-height:40px;
+  font-family:inherit;min-height:40px;
 }
-.btn-w{background:var(--btn-w);color:#0a0c14}
-.btn-w:active{background:#e0e0e0}
-.btn-b{background:var(--btn-b);color:#0a0c14}
-.btn-b:active{background:var(--btn-b2)}
+.btn-w{background:#fff;color:#0a0c14;border:1px solid #ddd}
+.btn-w:active{background:#eee}
+.btn-b{background:#d0e4f7;color:#0a0c14}
+.btn-b:active{background:#a8cce8}
 .btn-d{background:transparent;color:var(--rd);border:1px solid var(--rd)}
 .btn-d:active{background:var(--rd);color:#fff}
 .btn.block{width:100%}
 .btn.sm{font-size:11px;padding:5px 10px;min-height:28px}
+.btn:disabled{opacity:.5;pointer-events:none}
 
-/* role select cards */
+/* role select for register */
 .role-card{
   display:block;width:100%;padding:16px;border-radius:var(--r);
-  border:1px solid var(--bdr);background:var(--srf);cursor:pointer;
+  border:1px solid var(--bdr);background:#f5f5f7;cursor:pointer;
   margin-bottom:10px;transition:all .15s;text-align:left;color:var(--tx);
 }
-.role-card:active,.role-card:hover{border-color:var(--ac);background:var(--crd)}
+.role-card:active,.role-card:hover{border-color:var(--ac);background:#f0f0f3}
 .role-card .rc-icon{font-size:24px;margin-bottom:6px}
 .role-card .rc-title{font-size:15px;font-weight:600;margin-bottom:3px}
 .role-card .rc-desc{font-size:11px;color:var(--tx2)}
 
-/* product picker list */
+/* product picker */
 .prod-pick-list{max-height:50vh;overflow-y:auto}
 .prod-pick-row{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 0;border-bottom:1px solid var(--bdr);cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
 }
 .prod-pick-row:active{opacity:.7}
 .prod-pick-row .pp-info{flex:1}
@@ -149,34 +148,24 @@ body{
 .prod-pick-row .pp-meta{font-size:10px;color:var(--tx3);margin-top:2px}
 .prod-pick-row .pp-check{
   width:22px;height:22px;border-radius:50%;border:2px solid var(--tx3);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  transition:all .15s;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;
 }
 .prod-pick-row.sel .pp-check{background:var(--ac);border-color:var(--ac)}
-.prod-pick-row.sel .pp-check::after{content:'';width:8px;height:8px;background:#0a0c14;border-radius:50%}
-
-/* order item row */
-.oi-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bdr)}
-.oi-row:last-child{border-bottom:none}
-.oi-row .prod{flex:1;font-size:13px}
-.oi-row .qty{width:60px;text-align:center;background:var(--bg);border:1px solid var(--bdr);
-  border-radius:var(--rs);color:var(--tx);padding:6px;font-family:var(--mono);font-size:13px;outline:none}
-.oi-row .qty:focus{border-color:var(--ac)}
-.oi-row .sub{font-family:var(--mono);font-size:12px;color:var(--ac);width:60px;text-align:right}
+.prod-pick-row.sel .pp-check::after{content:'';width:8px;height:8px;background:#fff;border-radius:50%}
 
 /* tags */
 .tag{
   display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;
   font-weight:500;font-family:var(--mono);
 }
-.tag.warn{background:rgba(212,148,58,.15);color:var(--ac)}
-.tag.ok{background:rgba(74,158,108,.15);color:var(--gr)}
-.tag.err{background:rgba(197,74,74,.15);color:var(--rd)}
-.tag.info{background:rgba(91,140,201,.15);color:var(--bl)}
+.tag.warn{background:rgba(212,148,58,.1);color:var(--ac)}
+.tag.ok{background:rgba(52,199,89,.1);color:var(--gr)}
+.tag.err{background:rgba(255,59,48,.1);color:var(--rd)}
+.tag.info{background:rgba(0,122,255,.1);color:var(--bl)}
 
 /* modal */
 .modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;
   display:flex;align-items:flex-end;justify-content:center;
 }
 .modal{
@@ -186,18 +175,18 @@ body{
 .modal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .modal-h h2{font-size:16px;font-weight:600}
 .modal-h .close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;
-  border-radius:50%;background:var(--crd);cursor:pointer;color:var(--tx3);font-size:18px;
-  -webkit-tap-highlight-color:transparent}
+  border-radius:50%;background:#f5f5f7;cursor:pointer;color:var(--tx3);font-size:18px}
 
-/* empty */
+/* empty & loading */
 .empty{text-align:center;padding:40px 20px;color:var(--tx3)}
 .empty p{font-size:13px;line-height:1.6}
+.spinner{width:24px;height:24px;border:2px solid var(--bdr);border-top-color:var(--ac);border-radius:50%;animation:spin .6s linear infinite;margin:20px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* utils */
 .flex{display:flex}.gap8{gap:8px}.mt8{margin-top:8px}.mt12{margin-top:12px}
 .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.between{justify-content:space-between}
-.acenter{align-items:center}.txtr{text-align:right}.spacer{flex:1}
-.page{display:none}.page.v{display:block}
+.acenter{align-items:center}.page{display:none}.page.v{display:block}
 
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -207,93 +196,80 @@ body{
 <body>
 <div id="app">
 
-<!-- ═══════════ LOGIN PAGE ═══════════ -->
-<div class="page v" id="pg_login">
-  <div class="login-wrap">
+<!-- ═══════════ AUTH PAGE ═══════════ -->
+<div class="page v" id="pg_auth">
+  <div class="auth-wrap">
     <div class="logo">进销存管理</div>
-    <div class="sub">多店进销存系统 · 总店/分店</div>
-    <div class="login-card">
-      <div class="title">选择身份进入</div>
-      <div class="role-card" onclick="loginAs('main')">
-        <div class="rc-icon">🏢</div>
-        <div class="rc-title">总店</div>
-        <div class="rc-desc">商品管理 · 店铺管理 · 报货单 · 供货账单</div>
-      </div>
-      <div class="role-card" onclick="showBranchLogin()">
-        <div class="rc-icon">🏪</div>
-        <div class="rc-title">分店</div>
-        <div class="rc-desc" id="branchLoginLabel">报货 · 商品浏览</div>
-      </div>
-    </div>
+    <div class="sub">多店进销存系统 · 账号登录</div>
+    <div class="auth-card" id="authCard"></div>
   </div>
 </div>
 
-<!-- ═══════════ HEADER ═══════════ -->
-<div class="page" id="pg_main_wrap">
+<!-- ═══════════ MAIN APP ═══════════ -->
+<div class="page" id="pg_main">
   <div class="hd">
     <h1 id="pageTitle">仪表盘</h1>
-    <div class="role" onclick="goBackLogin()" id="roleBadge">总店</div>
+    <div class="right">
+      <span class="role" id="roleBadge"></span>
+      <span class="logout-btn" onclick="doLogout()">退出</span>
+    </div>
   </div>
 
-<!-- ═══════════ PAGE: Dashboard ═══════════ -->
+<!-- ══ DASHBOARD ══ -->
 <div class="page v" id="pg_dash">
   <div class="stats" id="dash_stats"></div>
-  <div class="cd">
-    <div class="cd-h"><span>低库存预警</span><small>库存 &lt; 10</small></div>
-    <div id="dash_low_stock"></div>
-  </div>
+  <div class="cd"><div class="cd-h"><span>低库存预警</span><small>库存 &lt; 10</small></div><div id="dash_low"></div></div>
   <div class="cd" id="dash_bills_box">
     <div class="cd-h"><span>近期账单</span><small id="dash_bills_link" style="cursor:pointer;color:var(--ac)"></small></div>
-    <div id="dash_recent_bills"></div>
+    <div id="dash_bills"></div>
   </div>
 </div>
 
-<!-- ═══════════ PAGE: Products ═══════════ -->
+<!-- ══ PRODUCTS ══ -->
 <div class="page" id="pg_products">
-  <div id="prod_header" class="flex between acenter mb8">
+  <div class="flex between acenter mb8">
     <input placeholder="搜索商品..." id="prodSearch" oninput="renderProducts()"
-      style="flex:1;padding:10px 12px;background:var(--crd);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none">
+      style="flex:1;padding:10px 12px;background:#f5f5f7;border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none">
     <button class="btn btn-b sm" style="margin-left:8px;white-space:nowrap" id="prodAddBtn" onclick="openProductModal()">+ 添加</button>
   </div>
   <div id="prodList"></div>
 </div>
 
-<!-- ═══════════ PAGE: Stores ═══════════ -->
+<!-- ══ STORES ══ -->
 <div class="page" id="pg_stores">
   <div class="flex between acenter mb8">
-    <span style="font-size:13px;color:var(--tx2)" id="storeCount">共 0 家</span>
+    <span style="font-size:13px;color:var(--tx2)" id="storeCount"></span>
     <button class="btn btn-b sm" onclick="openStoreModal()">+ 添加</button>
   </div>
   <div id="storeList"></div>
 </div>
 
-<!-- ═══════════ PAGE: Orders ═══════════ -->
+<!-- ══ ORDERS ══ -->
 <div class="page" id="pg_orders">
   <div class="flex acenter gap8 mb8">
     <input type="date" id="orderDate" onchange="renderOrders()"
-      style="flex:1;padding:10px 12px;background:var(--crd);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)">
+      style="flex:1;padding:10px 12px;background:#f5f5f7;border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)">
     <button class="btn btn-w sm" style="white-space:nowrap" onclick="openOrderModal()">+ 报货单</button>
   </div>
   <div id="orderList"></div>
 </div>
 
-<!-- ═══════════ PAGE: Bills ═══════════ -->
+<!-- ══ BILLS ══ -->
 <div class="page" id="pg_bills">
   <div class="flex acenter gap8 mb8">
     <select id="billStoreFilter" onchange="renderBills()"
-      style="flex:1;padding:10px 12px;background:var(--crd);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none"></select>
+      style="flex:1;padding:10px 12px;background:#f5f5f7;border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none"></select>
     <select id="billStatusFilter" onchange="renderBills()"
-      style="padding:10px 12px;background:var(--crd);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none;width:100px">
+      style="padding:10px 12px;background:#f5f5f7;border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none;width:100px">
       <option value="">全部</option><option value="pending">待结</option><option value="paid">已结</option></select>
   </div>
   <div id="billList"></div>
-  <button class="btn btn-w block mt8" id="genBillBtn" onclick="generateBill()">生成供货账单</button>
+  <button class="btn btn-w block mt8" onclick="generateBill()">生成供货账单</button>
+</div>
 </div>
 
-</div><!-- end main_wrap -->
-
-<!-- ═══════════ NAV (总店) ═══════════ -->
-<nav id="nav_main">
+<!-- ═══════════ NAV ═══════════ -->
+<nav id="nav">
   <div class="t ac" onclick="switchTab(0)" id="nav0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>概览</span></div>
   <div class="t" onclick="switchTab(1)" id="nav1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>商品</span></div>
   <div class="t" onclick="switchTab(2)" id="nav2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>店铺</span></div>
@@ -301,281 +277,223 @@ body{
   <div class="t" onclick="switchTab(4)" id="nav4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg><span>账单</span></div>
 </nav>
 
-<!-- ═══════════ NAV (分店) ═══════════ -->
-<nav id="nav_branch" style="display:none">
-  <div class="t ac" onclick="switchTab(0)" id="navb0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>概览</span></div>
-  <div class="t" onclick="switchTab(1)" id="navb1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>商品</span></div>
-  <div class="t" onclick="switchTab(3)" id="navb3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>报货</span></div>
-</nav>
-
-<!-- ═══════════ MODAL CONTAINER ═══════════ -->
+<!-- ═══════════ MODAL ═══════════ -->
 <div id="modalContainer"></div>
 
 <script>
-const LS=localStorage;
-function load(k,d){try{return JSON.parse(LS.getItem(k)||'null')||d}catch(e){return d}}
-function save(k,v){LS.setItem(k,JSON.stringify(v))}
+/* ============ SUPABASE INIT ============ */
+const sb = supabase.createClient(
+  'https://ldtjjrnvniirfrnmtfbd.supabase.co',
+  'sb_publishable_NaiTMvOQ-Zgd0g3RMxU8XQ_0ELa_fsi'
+);
 
-let products=load('p',[]);
-let stores=load('s',[]);
-let orders=load('o',[]);
-let bills=load('b',[]);
-let currentRole=''; // 'main' | store_id
-let currentTab=0;
-let isLoggedIn=false;
+let currentUser = null;
+let profile = null;
+let currentTab = 0;
 
-// seed demo data
-function seedData(){
-  if(!stores.length){
-    stores=[
-      {id:'s1',name:'总店',type:'main',contact:'张总',phone:'13800000001',addr:'市中心A座'},
-      {id:'s2',name:'城东分店',type:'branch',contact:'李店长',phone:'13800000002',addr:'城东B区'},
-      {id:'s3',name:'王记便利店',type:'franchise',contact:'王老板',phone:'13800000003',addr:'阳光路12号'},
-      {id:'s4',name:'便民超市',type:'franchise',contact:'赵老板',phone:'13800000004',addr:'建设路45号'},
-      {id:'s5',name:'好邻居',type:'franchise',contact:'钱老板',phone:'13800000005',addr:'和平路78号'},
-    ];
-    save('s',stores);
-  }
-  if(!products.length){
-    products=[
-      {id:'p1',name:'农夫山泉550ml',sku:'NFS-550',price:0.85,price2:1.5,stock:240,unit:'箱(24瓶)'},
-      {id:'p2',name:'康师傅红烧牛肉面',sku:'KSF-HS',price:2.8,price2:4.0,stock:85,unit:'箱(24包)'},
-      {id:'p3',name:'青岛啤酒500ml',sku:'QD-PJ',price:3.5,price2:5.0,stock:120,unit:'箱(12瓶)'},
-      {id:'p4',name:'王老吉310ml',sku:'WLJ-310',price:2.5,price2:3.5,stock:7,unit:'箱(24罐)'},
-      {id:'p5',name:'伊利纯牛奶250ml',sku:'YL-NN',price:2.2,price2:3.0,stock:45,unit:'箱(24盒)'},
-      {id:'p6',name:'可口可乐330ml',sku:'KKL-330',price:1.8,price2:2.5,stock:3,unit:'箱(24罐)'},
-      {id:'p7',name:'金龙鱼调和油5L',sku:'JLY-5L',price:42,price2:55,stock:18,unit:'桶'},
-      {id:'p8',name:'海天酱油500ml',sku:'HT-JY',price:6.5,price2:8.5,stock:60,unit:'瓶'},
-    ];
-    save('p',products);
-  }
-  if(!orders.length){
-    const today=new Date().toISOString().slice(0,10);
-    orders=[
-      {id:'o1',storeId:'s3',date:today,items:[{prodId:'p1',qty:5},{prodId:'p2',qty:3},{prodId:'p4',qty:2}],status:'confirmed'},
-      {id:'o2',storeId:'s4',date:today,items:[{prodId:'p3',qty:4},{prodId:'p6',qty:6}],status:'confirmed'},
-      {id:'o3',storeId:'s5',date:today,items:[{prodId:'p7',qty:2},{prodId:'p8',qty:3}],status:'pending'},
-    ];
-    save('o',orders);
-  }
-  if(!bills.length){
-    bills=[
-      {id:'b1',storeId:'s3',date:'2026-06-20',orderIds:['o1'],total:0,status:'pending'},
-      {id:'b2',storeId:'s4',date:'2026-06-19',orderIds:['o2'],total:0,status:'paid'},
-    ];
-    save('b',bills);
-  }
-}
-seedData();
-
-/* helpers */
-function uid(){return 'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,7)}
-function fmt(n){return n.toFixed(2)}
-function byId(s,id){return s.find(x=>x.id===id)}
-function storeName(id){const s=byId(stores,id);return s?s.name:'未知'}
-function prodName(id){const p=byId(products,id);return p?p.name:'未知'}
-function prodPrice(id){const p=byId(products,id);return p?p.price:0}
-function isMain(){return currentRole==='main'}
-
-function visibleStores(){
-  if(isMain())return stores.filter(s=>s.type!=='main');
-  // branch: only itself as the reporter, see franchises for orders
-  return stores.filter(s=>s.type==='franchise');
-}
-function visibleOrders(){
-  if(isMain())return orders;
-  // branch: show orders submitted by this branch itself (for its own reference)
-  return orders.filter(o=>o.storeId===currentRole);
+/* ============ AUTH ============ */
+function renderAuth(mode){
+  const card = document.getElementById('authCard');
+  const isLogin = mode==='login';
+  card.innerHTML = `
+    <h2>${isLogin?'登录':'注册'}</h2>
+    <div class="fg"><label>邮箱</label><input type="email" id="af_email" placeholder="your@email.com"></div>
+    <div class="fg"><label>密码</label><input type="password" id="af_pw" placeholder="至少6位"></div>
+    <div class="err" id="af_err"></div>
+    <button class="btn btn-w block mt8" onclick="doAuth('${mode}')">${isLogin?'登录':'注册'}</button>
+    <div class="switch" onclick="renderAuth('${isLogin?'register':'login'}')">${isLogin?'没有账号？点击注册':'已有账号？点击登录'}</div>`;
 }
 
-/* login */
-function loginAs(role){
-  currentRole=role;
-  isLoggedIn=true;
-  save('role',role);
-  document.getElementById('pg_login').classList.remove('v');
-  document.getElementById('pg_main_wrap').classList.add('v');
-  const isM=isMain();
-  document.getElementById('nav_main').style.display=isM?'flex':'none';
-  document.getElementById('nav_branch').style.display=isM?'none':'flex';
-  document.getElementById('roleBadge').textContent=isM?'总店':'分店';
-  // show/hide tabs
-  document.getElementById('pg_stores').style.display=isM?'':'none';
-  document.getElementById('pg_bills').style.display=isM?'':'none';
-  document.getElementById('dash_bills_box').style.display=isM?'':'none';
-  document.getElementById('prodAddBtn').style.display=isM?'inline-flex':'none';
-  setupTabs();
+async function doAuth(mode){
+  const email = document.getElementById('af_email').value.trim();
+  const pw = document.getElementById('af_pw').value;
+  const err = document.getElementById('af_err');
+  err.textContent = '';
+  if(!email||!pw){err.textContent='请填写邮箱和密码';return}
+  if(pw.length<6){err.textContent='密码至少6位';return}
+
+  let res;
+  if(mode==='login'){
+    res = await sb.auth.signInWithPassword({email,password:pw});
+  } else {
+    res = await sb.auth.signUp({email,password:pw});
+  }
+  if(res.error){err.textContent=res.error.message;return}
+  if(mode==='register'){
+    err.style.color='var(--gr)';
+    err.textContent='注册成功，正在登录...';
+    setTimeout(async()=>{
+      await sb.auth.signInWithPassword({email,password:pw});
+    },800);
+  }
+}
+
+/* ============ SESSION ============ */
+sb.auth.onAuthStateChange(async(event,session)=>{
+  if(session?.user){
+    currentUser = session.user;
+    const {data} = await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+    profile = data;
+    showMainApp();
+  } else {
+    currentUser = null;
+    profile = null;
+    showAuthPage();
+  }
+});
+
+function showAuthPage(){
+  document.getElementById('pg_auth').classList.add('v');
+  document.getElementById('pg_main').classList.remove('v');
+  document.getElementById('nav').style.display='none';
+  renderAuth('login');
+}
+
+function showMainApp(){
+  document.getElementById('pg_auth').classList.remove('v');
+  document.getElementById('pg_main').classList.add('v');
+  document.getElementById('nav').style.display='flex';
+
+  const isMain = profile?.role==='main';
+  document.getElementById('roleBadge').textContent = isMain?'总店':'分店';
+  document.getElementById('nav2').style.display = isMain?'flex':'none';
+  document.getElementById('nav4').style.display = isMain?'flex':'none';
+  document.getElementById('pg_stores').style.display = isMain?'':'none';
+  document.getElementById('pg_bills').style.display = isMain?'':'none';
+  document.getElementById('prodAddBtn').style.display = isMain?'inline-flex':'none';
+
+  const tabs = document.querySelectorAll('#nav .t');
+  tabs.forEach(t=>t.classList.remove('ac'));
+  tabs[0].classList.add('ac');
+  currentTab=0;
   switchTab(0);
 }
 
-function showBranchLogin(){
-  const branches=stores.filter(s=>s.type==='branch');
-  if(branches.length===1){
-    loginAs(branches[0].id);
-    return;
-  }
-  if(branches.length===0){
-    alert('暂无分店，请先以总店身份登录添加分店');
-    return;
-  }
-  let html='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-h"><h2>选择分店</h2><div class="close" onclick="closeModal()">×</div></div>';
-  branches.forEach(b=>{
-    html+=`<div class="role-card" onclick="loginAs('${b.id}');closeModal()"><div class="rc-title">${b.name}</div><div class="rc-desc">${b.addr}</div></div>`;
-  });
-  html+='</div></div>';
-  showModal(html);
+async function doLogout(){
+  await sb.auth.signOut();
 }
 
-function goBackLogin(){
-  if(!confirm('退出当前账号，返回登录？'))return;
-  isLoggedIn=false;currentRole='';
-  save('role','');
-  document.getElementById('pg_login').classList.add('v');
-  document.getElementById('pg_main_wrap').classList.remove('v');
-  document.getElementById('nav_main').style.display='flex';
-  document.getElementById('nav_branch').style.display='none';
-}
-
-function setupTabs(){
-  const isM=isMain();
-  const mainTabs=document.querySelectorAll('#nav_main .t');
-  const branchTabs=document.querySelectorAll('#nav_branch .t');
-  // reset all
-  mainTabs.forEach(t=>t.classList.remove('ac'));
-  branchTabs.forEach(t=>t.classList.remove('ac'));
-  mainTabs[0].classList.add('ac');
-  branchTabs[0].classList.add('ac');
-}
-
-const titles_main=['仪表盘','商品管理','店铺管理','报货单','供货账单'];
-const titles_branch=['概览','商品浏览','','报货',''];
-
+/* ============ NAV ============ */
 function switchTab(idx){
+  if(!profile) return;
+  const isMain = profile.role==='main';
+  if(!isMain && (idx===2||idx===4)) return;
   currentTab=idx;
-  const isM=isMain();
-  // hide all pages
-  document.querySelectorAll('#pg_main_wrap .page').forEach(p=>p.classList.remove('v'));
-  const pageId=isM?['pg_dash','pg_products','pg_stores','pg_orders','pg_bills'][idx]:['pg_dash','pg_products',null,'pg_orders',null][idx];
-  if(pageId)document.getElementById(pageId).classList.add('v');
-  document.getElementById('pageTitle').textContent=isM?titles_main[idx]:titles_branch[idx];
-  // nav active
-  const navPrefix=isM?'nav':'navb';
-  const maxTab=isM?5:4;
-  for(let i=0;i<maxTab;i++){
-    const el=document.getElementById(navPrefix+i);
-    if(el)el.classList.toggle('ac',i===idx||(isM?false:i===idx));
-  }
-  // branch nav: map tab 1->0, tab 3->1
-  if(!isM){
-    const btabs=document.querySelectorAll('#nav_branch .t');
-    btabs.forEach((t,i)=>{t.classList.remove('ac')});
-    if(idx===0&&btabs[0])btabs[0].classList.add('ac');
-    if(idx===1&&btabs[1])btabs[1].classList.add('ac');
-    if(idx===3&&btabs[2])btabs[2].classList.add('ac');
-  }
+
+  const pages = ['pg_dash','pg_products','pg_stores','pg_orders','pg_bills'];
+  const titles = ['仪表盘','商品管理','店铺管理','报货单','供货账单'];
+  document.querySelectorAll('#pg_main .page').forEach(p=>p.classList.remove('v'));
+  document.getElementById(pages[idx]).classList.add('v');
+  document.getElementById('pageTitle').textContent = titles[idx];
+
+  const tabs = document.querySelectorAll('#nav .t');
+  tabs.forEach((t,i)=>t.classList.toggle('ac',i===idx));
+
   refreshTab(idx);
   window.scrollTo(0,0);
 }
 
-function refreshTab(idx){
-  if(idx===0)refreshDash();
-  if(idx===1)renderProducts();
-  if(idx===2&&isMain())renderStores();
+async function refreshTab(idx){
+  if(idx===0) await loadDash();
+  if(idx===1) await loadProducts();
+  if(idx===2) await loadStores();
   if(idx===3){
-    document.getElementById('orderDate').value=new Date().toISOString().slice(0,10);
-    renderOrders();
+    document.getElementById('orderDate').value = new Date().toISOString().slice(0,10);
+    await loadOrders();
   }
-  if(idx===4&&isMain()){renderBillFilters();renderBills();}
+  if(idx===4){
+    await loadBillFilters();
+    await loadBills();
+  }
 }
 
-/* dashboard */
-function refreshDash(){
-  const vs=visibleStores();
-  const statsDiv=document.getElementById('dash_stats');
-  const today=new Date().toISOString().slice(0,10);
-  const todayOrders=visibleOrders().filter(o=>o.date===today);
-  if(isMain()){
-    statsDiv.innerHTML=`
-      <div class="st"><div class="v">${products.length}</div><div class="l">商品数</div></div>
-      <div class="st"><div class="v">${vs.length}</div><div class="l">加盟店</div></div>
-      <div class="st"><div class="v">${todayOrders.length}</div><div class="l">今日报货</div></div>
-      <div class="st"><div class="v">${bills.filter(b=>b.status==='pending').length}</div><div class="l">待结账单</div></div>`;
-  }else{
-    statsDiv.innerHTML=`
-      <div class="st"><div class="v">${products.length}</div><div class="l">可报商品</div></div>
-      <div class="st"><div class="v">${todayOrders.length}</div><div class="l">今日报货</div></div>
-      <div class="st"><div class="v">${orders.filter(o=>o.status==='confirmed').length}</div><div class="l">已确认</div></div>
-      <div class="st"><div class="v">${orders.filter(o=>o.status==='pending').length}</div><div class="l">待确认</div></div>`;
+/* ============ DASHBOARD ============ */
+async function loadDash(){
+  const isMain = profile.role==='main';
+  const today = new Date().toISOString().slice(0,10);
+
+  const [pr,st,od,bl,lo] = await Promise.all([
+    sb.from('products').select('id',{count:'exact',head:true}),
+    sb.from('stores').select('id',{count:'exact',head:true}),
+    sb.from('orders').select('id',{count:'exact',head:true}).eq('date',today),
+    sb.from('bills').select('id',{count:'exact',head:true}).eq('status','pending'),
+    sb.from('products').select('*').lt('stock',10)
+  ]);
+
+  if(isMain){
+    document.getElementById('dash_stats').innerHTML = `
+      <div class="st"><div class="v">${pr.count||0}</div><div class="l">商品数</div></div>
+      <div class="st"><div class="v">${st.count||0}</div><div class="l">店铺数</div></div>
+      <div class="st"><div class="v">${od.count||0}</div><div class="l">今日报货</div></div>
+      <div class="st"><div class="v">${bl.count||0}</div><div class="l">待结账单</div></div>`;
+  } else {
+    document.getElementById('dash_stats').innerHTML = `
+      <div class="st"><div class="v">${pr.count||0}</div><div class="l">可报商品</div></div>
+      <div class="st"><div class="v">${od.count||0}</div><div class="l">今日报货</div></div>
+      <div class="st"><div class="v">-</div><div class="l">已确认</div></div>
+      <div class="st"><div class="v">-</div><div class="l">待确认</div></div>`;
   }
 
-  // low stock
-  const low=products.filter(p=>p.stock<10);
-  const lowDiv=document.getElementById('dash_low_stock');
-  if(!low.length){lowDiv.innerHTML='<div class="empty"><p>暂无低库存商品</p></div>'}else{
-    lowDiv.innerHTML=low.map(p=>
-      `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bdr)">
+  const lowDiv = document.getElementById('dash_low');
+  if(!lo.data||!lo.data.length){
+    lowDiv.innerHTML='<div class="empty"><p>暂无低库存商品</p></div>';
+  } else {
+    lowDiv.innerHTML = lo.data.map(p=>
+      `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bdr)">
         <span style="font-size:12px">${p.name}</span>
-        <span style="font-family:var(--mono);font-size:12px;color:var(--rd)">${p.stock} ${p.unit}</span></div>`
+        <span style="font-family:var(--mono);font-size:12px;color:var(--rd)">${p.stock} ${p.unit||'件'}</span></div>`
     ).join('');
   }
 
-  if(isMain()){
-    const recentBills=bills.filter(b=>vs.some(s=>s.id===b.storeId)).slice(-5).reverse();
-    const rbDiv=document.getElementById('dash_recent_bills');
+  if(isMain){
+    const {data:rbs} = await sb.from('bills').select('*,stores(name)').order('created_at',{ascending:false}).limit(5);
     document.getElementById('dash_bills_link').textContent='查看全部';
-    document.getElementById('dash_bills_link').onclick=function(){switchTab(4)};
-    if(!recentBills.length){rbDiv.innerHTML='<div class="empty"><p>暂无账单</p></div>'}else{
-      rbDiv.innerHTML=recentBills.map(b=>{
-        const total=calcBillTotal(b);
+    document.getElementById('dash_bills_link').onclick=()=>switchTab(4);
+    const rbDiv = document.getElementById('dash_bills');
+    if(!rbs||!rbs.length){rbDiv.innerHTML='<div class="empty"><p>暂无账单</p></div>'}else{
+      rbDiv.innerHTML = rbs.map(b=>{
+        const total = b.total||0;
         return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bdr)">
-          <span style="font-size:12px">${storeName(b.storeId)} · ${b.date}</span>
-          <span style="font-family:var(--mono);font-size:12px;color:var(--ac)">¥${fmt(total)}</span>
+          <span style="font-size:12px">${b.stores?.name||'未知'} · ${b.date}</span>
+          <span style="font-family:var(--mono);font-size:12px;color:var(--ac)">¥${total.toFixed(2)}</span>
           <span class="tag ${b.status==='paid'?'ok':'warn'}">${b.status==='paid'?'已结':'待结'}</span></div>`;
       }).join('');
     }
-  }else{
+  } else {
     document.getElementById('dash_bills_box').style.display='none';
   }
 }
 
-/* products */
-function renderProducts(){
-  const q=(document.getElementById('prodSearch')?.value||'').toLowerCase();
-  const list=products.filter(p=>!q||p.name.toLowerCase().includes(q)||p.sku.toLowerCase().includes(q));
-  const div=document.getElementById('prodList');
-  if(!list.length){div.innerHTML='<div class="empty"><p>暂无商品</p></div>';return}
-  div.innerHTML=list.map(p=>
-    `<div class="cd" ${isMain()?`style="cursor:pointer" onclick="openProductModal('${p.id}')"`:''}>
+/* ============ PRODUCTS ============ */
+async function loadProducts(){
+  const q = (document.getElementById('prodSearch')?.value||'').toLowerCase();
+  let query = sb.from('products').select('*').order('created_at');
+  if(q) query = query.or(`name.ilike.%${q}%,sku.ilike.%${q}%`);
+  const {data} = await query;
+  const div = document.getElementById('prodList');
+  if(!data||!data.length){div.innerHTML='<div class="empty"><p>暂无商品</p></div>';return}
+  div.innerHTML = data.map(p=>
+    `<div class="cd" ${profile.role==='main'?`style="cursor:pointer" onclick="openProductModal('${p.id}')"`:''}>
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
-          <div style="font-size:13px;font-weight:500">${p.name}</div>
-          <div style="font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:2px">${p.sku}</div>
-        </div>
-        <span class="tag ${p.stock<10?'err':p.stock<30?'warn':'ok'}">库存 ${p.stock} ${p.unit}</span>
-      </div>
+        <div><div style="font-size:13px;font-weight:500">${p.name}</div>
+        <div style="font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:2px">${p.sku||''}</div></div>
+        <span class="tag ${p.stock<10?'err':p.stock<30?'warn':'ok'}">库存 ${p.stock} ${p.unit||'件'}</span></div>
       <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--tx2)">
-        <span>批发 ¥${p.price}</span><span>零售 ¥${p.price2}</span></div>
-    </div>`
+        <span>批发 ¥${p.price}</span><span>零售 ¥${p.price2}</span></div></div>`
   ).join('');
-  // hide add button for branch
-  const addBtn=document.getElementById('prodAddBtn');
-  if(addBtn)addBtn.style.display=isMain()?'inline-flex':'none';
 }
 
 function openProductModal(id){
-  if(!isMain())return;
-  const p=id?byId(products,id):null;
-  const html=`
+  const p = window._prodCache?.find(x=>x.id===id);
+  const html = `
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal">
     <div class="modal-h"><h2>${p?'编辑商品':'添加商品'}</h2><div class="close" onclick="closeModal()">×</div></div>
     <div class="fg"><label>商品名称</label><input id="pf_name" value="${p?p.name:''}"></div>
-    <div class="fg"><label>SKU 编码</label><input id="pf_sku" value="${p?p.sku:''}"></div>
-    <div class="fg-row">
-      <div class="fg"><label>批发价 ¥</label><input id="pf_price" type="number" step="0.01" value="${p?p.price:''}"></div>
-      <div class="fg"><label>零售价 ¥</label><input id="pf_price2" type="number" step="0.01" value="${p?p.price2:''}"></div></div>
-    <div class="fg-row">
-      <div class="fg"><label>库存数量</label><input id="pf_stock" type="number" value="${p?p.stock:0}"></div>
-      <div class="fg"><label>单位</label><input id="pf_unit" value="${p?p.unit:'件'}"></div></div>
+    <div class="fg"><label>SKU 编码</label><input id="pf_sku" value="${p?p.sku||'':''}"></div>
+    <div class="fg-row"><div class="fg"><label>批发价 ¥</label><input id="pf_price" type="number" step="0.01" value="${p?p.price:''}"></div>
+    <div class="fg"><label>零售价 ¥</label><input id="pf_price2" type="number" step="0.01" value="${p?p.price2:''}"></div></div>
+    <div class="fg-row"><div class="fg"><label>库存</label><input id="pf_stock" type="number" value="${p?p.stock||0}"></div>
+    <div class="fg"><label>单位</label><input id="pf_unit" value="${p?p.unit||'件'}"></div></div>
     <div style="display:flex;gap:8px;margin-top:14px">
       ${p?`<button class="btn btn-d block" onclick="deleteProduct('${p.id}')">删除</button>`:''}
       <button class="btn btn-w block" onclick="saveProduct('${p?p.id:''}')">保存</button></div>
@@ -583,9 +501,9 @@ function openProductModal(id){
   showModal(html);
 }
 
-function saveProduct(id){
-  const data={
-    id:id||uid(),name:document.getElementById('pf_name').value.trim(),
+async function saveProduct(id){
+  const data = {
+    name:document.getElementById('pf_name').value.trim(),
     sku:document.getElementById('pf_sku').value.trim(),
     price:parseFloat(document.getElementById('pf_price').value)||0,
     price2:parseFloat(document.getElementById('pf_price2').value)||0,
@@ -593,36 +511,37 @@ function saveProduct(id){
     unit:document.getElementById('pf_unit').value.trim()||'件'
   };
   if(!data.name)return alert('请输入商品名称');
-  if(id){const idx=products.findIndex(p=>p.id===id);if(idx>=0)products[idx]=data}
-  else products.push(data);
-  save('p',products);
-  closeModal();renderProducts();refreshDash();
-}
-function deleteProduct(id){
-  if(!confirm('确定删除该商品？'))return;
-  products=products.filter(p=>p.id!==id);save('p',products);
-  closeModal();renderProducts();refreshDash();
+  if(id){
+    await sb.from('products').update(data).eq('id',id);
+  } else {
+    await sb.from('products').insert([data]);
+  }
+  closeModal();await loadProducts();
 }
 
-/* stores */
-function renderStores(){
-  if(!isMain())return;
-  const list=stores;
-  document.getElementById('storeCount').textContent=`共 ${list.length} 家`;
-  const typeLabel={main:'总店',branch:'分店',franchise:'加盟店'};
-  document.getElementById('storeList').innerHTML=list.map(s=>
+async function deleteProduct(id){
+  if(!confirm('确定删除？'))return;
+  await sb.from('products').delete().eq('id',id);
+  closeModal();await loadProducts();
+}
+
+/* ============ STORES ============ */
+async function loadStores(){
+  const {data} = await sb.from('stores').select('*').order('created_at');
+  document.getElementById('storeCount').textContent = `共 ${data?.length||0} 家`;
+  const tp = {main:'总店',branch:'分店',franchise:'加盟店'};
+  document.getElementById('storeList').innerHTML = (data||[]).map(s=>
     `<div class="cd"><div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div><div style="font-size:13px;font-weight:500">${s.name}</div>
-      <div style="font-size:10px;color:var(--tx3);margin-top:2px">${s.addr}</div></div>
-      <span class="tag ${s.type==='main'?'info':s.type==='branch'?'ok':'warn'}">${typeLabel[s.type]}</span></div>
+      <div style="font-size:10px;color:var(--tx3);margin-top:2px">${s.addr||''}</div></div>
+      <span class="tag ${s.type==='main'?'info':s.type==='branch'?'ok':'warn'}">${tp[s.type]||''}</span></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-      <span style="font-size:10px;color:var(--tx3)">${s.contact} · ${s.phone}</span>
+      <span style="font-size:10px;color:var(--tx3)">${s.contact||''} · ${s.phone||''}</span>
       ${s.type==='main'?'':`<button class="btn btn-b sm" onclick="openStoreModal('${s.id}')">编辑</button>`}</div></div>`
   ).join('');
 }
 function openStoreModal(id){
-  if(!isMain())return;
-  const s=id?byId(stores,id):null;
+  const s = window._storeCache?.find(x=>x.id===id);
   showModal(`
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal">
     <div class="modal-h"><h2>${s?'编辑店铺':'添加店铺'}</h2><div class="close" onclick="closeModal()">×</div></div>
@@ -630,74 +549,90 @@ function openStoreModal(id){
     <div class="fg"><label>类型</label><select id="sf_type">
       <option value="franchise" ${s&&s.type==='franchise'?'selected':''}>加盟店</option>
       <option value="branch" ${s&&s.type==='branch'?'selected':''}>分店</option>
-      ${isMain()?'<option value="main" '+(s&&s.type==='main'?'selected':'')+'>总店</option>':''}</select></div>
-    <div class="fg"><label>联系人</label><input id="sf_contact" value="${s?s.contact:''}"></div>
-    <div class="fg"><label>电话</label><input id="sf_phone" value="${s?s.phone:''}"></div>
-    <div class="fg"><label>地址</label><input id="sf_addr" value="${s?s.addr:''}"></div>
+      <option value="main" ${s&&s.type==='main'?'selected':''}>总店</option></select></div>
+    <div class="fg"><label>联系人</label><input id="sf_contact" value="${s?s.contact||'':''}"></div>
+    <div class="fg"><label>电话</label><input id="sf_phone" value="${s?s.phone||'':''}"></div>
+    <div class="fg"><label>地址</label><input id="sf_addr" value="${s?s.addr||'':''}"></div>
     <div style="display:flex;gap:8px;margin-top:14px">
       ${s&&s.type!=='main'?`<button class="btn btn-d block" onclick="deleteStore('${s.id}')">删除</button>`:''}
       <button class="btn btn-w block" onclick="saveStore('${s?s.id:''}')">保存</button></div>
   </div></div>`);
 }
-function saveStore(id){
-  const data={
-    id:id||uid(),name:document.getElementById('sf_name').value.trim(),
+async function saveStore(id){
+  const data = {
+    name:document.getElementById('sf_name').value.trim(),
     type:document.getElementById('sf_type').value,
     contact:document.getElementById('sf_contact').value.trim(),
     phone:document.getElementById('sf_phone').value.trim(),
     addr:document.getElementById('sf_addr').value.trim()
   };
   if(!data.name)return alert('请输入店铺名称');
-  if(id){const idx=stores.findIndex(s=>s.id===id);if(idx>=0)stores[idx]=data}
-  else stores.push(data);
-  save('s',stores);closeModal();renderStores();refreshDash();
+  if(id) await sb.from('stores').update(data).eq('id',id);
+  else await sb.from('stores').insert([data]);
+  closeModal();await loadStores();
 }
-function deleteStore(id){
-  if(!confirm('确定删除该店铺？'))return;
-  stores=stores.filter(s=>s.id!==id);save('s',stores);
-  closeModal();renderStores();refreshDash();
+async function deleteStore(id){
+  if(!confirm('确定删除？'))return;
+  await sb.from('stores').delete().eq('id',id);
+  closeModal();await loadStores();
 }
 
-/* orders */
-function renderOrders(){
-  const date=document.getElementById('orderDate').value||new Date().toISOString().slice(0,10);
-  const list=visibleOrders().filter(o=>o.date===date);
-  const div=document.getElementById('orderList');
-  if(!list.length){div.innerHTML=`<div class="empty"><p>${date} 暂无报货单</p></div>`;return}
-  div.innerHTML=list.map(o=>{
-    const total=o.items.reduce((s,i)=>s+prodPrice(i.prodId)*i.qty,0);
-    const showStore=isMain();
-    const itemsHtml=o.items.map(i=>
+/* ============ ORDERS ============ */
+async function loadOrders(){
+  const date = document.getElementById('orderDate').value||new Date().toISOString().slice(0,10);
+  let query = sb.from('orders').select('*,stores(name)').eq('date',date);
+  if(profile.role!=='main') query = query.eq('created_by',currentUser.id);
+  query = query.order('created_at',{ascending:false});
+  const {data} = await query;
+  const div = document.getElementById('orderList');
+  if(!data||!data.length){div.innerHTML=`<div class="empty"><p>${date} 暂无报货单</p></div>`;return}
+
+  // fetch all order items and products
+  const oids = data.map(o=>o.id);
+  const [{data:items},{data:prods}] = await Promise.all([
+    oids.length?sb.from('order_items').select('*').in('order_id',oids):Promise.resolve({data:[]}),
+    sb.from('products').select('*')
+  ]);
+  const prodMap = {}; (prods||[]).forEach(p=>{prodMap[p.id]=p});
+
+  div.innerHTML = data.map(o=>{
+    const oi = (items||[]).filter(i=>i.order_id===o.id);
+    const total = oi.reduce((s,i)=>s+(prodMap[i.prod_id]?.price||0)*i.qty,0);
+    const itemsHtml = oi.map(i=>
       `<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0">
-        <span style="color:var(--tx2)">${prodName(i.prodId)}</span>
+        <span style="color:var(--tx2)">${prodMap[i.prod_id]?.name||'未知'}</span>
         <span style="font-family:var(--mono);color:var(--tx2)">×${i.qty}</span></div>`).join('');
     return `<div class="cd">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:13px;font-weight:500">${showStore?storeName(o.storeId):o.date}</span>
+        <span style="font-size:13px;font-weight:500">${profile.role==='main'?o.stores?.name||'未知':o.date}</span>
         <span class="tag ${o.status==='confirmed'?'ok':'warn'}">${o.status==='confirmed'?'已确认':'待确认'}</span></div>
       ${itemsHtml}
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr)">
-        <span style="font-family:var(--mono);font-size:14px;color:var(--ac)">¥${fmt(total)}</span>
+        <span style="font-family:var(--mono);font-size:14px;color:var(--ac)">¥${total.toFixed(2)}</span>
         <div style="display:flex;gap:6px">
-          ${isMain()&&o.status==='pending'?`<button class="btn btn-w sm" onclick="confirmOrder('${o.id}')">确认</button>`:''}
+          ${profile.role==='main'&&o.status==='pending'?`<button class="btn btn-w sm" onclick="confirmOrder('${o.id}')">确认</button>`:''}
           <button class="btn btn-d sm" onclick="deleteOrder('${o.id}')">删除</button></div></div></div>`;
   }).join('');
 }
 
-function openOrderModal(){
-  // if branch, only report for itself
-  const dealerId=isMain()?null:currentRole;
-  const vs=isMain()?stores.filter(s=>s.type==='franchise'):[byId(stores,currentRole)];
-  if(!vs.length||!vs[0])return alert('没有可报货的加盟店');
-  const today=new Date().toISOString().slice(0,10);
-  const storeOpts=vs.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+async function openOrderModal(){
+  const {data:stores} = profile.role==='main'
+    ? await sb.from('stores').select('*').eq('type','franchise')
+    : await sb.from('stores').select('*').eq('id',profile.store_id);
 
-  let html=`
+  const {data:prods} = await sb.from('products').select('*').order('name');
+  if(!prods||!prods.length) return alert('暂无商品');
+  if(!stores||!stores.length) return alert('无可报货店铺');
+
+  const today = new Date().toISOString().slice(0,10);
+  const storeOpts = stores.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+
+  let html = `
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal" style="padding-bottom:24px">
     <div class="modal-h"><h2>新建报货单</h2><div class="close" onclick="closeModal()">×</div></div>
     <div class="fg"><label>日期</label><input type="date" id="of_date" value="${today}"></div>
-    ${isMain()?`<div class="fg"><label>加盟店</label><select id="of_store">${storeOpts}</select></div>`:`<input type="hidden" id="of_store" value="${currentRole}">`}
-    <div class="fg"><label>选择商品（点击添加，再次点击可修改数量）</label></div>
+    ${profile.role==='main'?`<div class="fg"><label>加盟店</label><select id="of_store">${storeOpts}</select></div>`:`<input type="hidden" id="of_store" value="${stores[0].id}">`}
+    <div class="fg"><label>选择商品（点击添加，再次点击修改数量）</label></div>
     <div class="prod-pick-list" id="of_prod_list"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)">
       <span style="font-size:12px;color:var(--tx3)">已选 <b id="of_sel_count">0</b> 种</span>
@@ -706,173 +641,185 @@ function openOrderModal(){
   </div></div>`;
   showModal(html);
 
-  window._orderItems=[];
+  window._orderItems = [];
+  window._orderProds = prods;
   function renderPicker(){
-    const div=document.getElementById('of_prod_list');
-    div.innerHTML=products.map(p=>{
-      const existing=window._orderItems.find(i=>i.prodId===p.id);
-      const sel=!!existing;
-      return `<div class="prod-pick-row${sel?' sel':''}" onclick="window._pickProduct('${p.id}')">
-        <div class="pp-info">
-          <div class="pp-name">${p.name}</div>
-          <div class="pp-meta">¥${p.price} · 库存 ${p.stock} ${p.unit}</div></div>
+    const div = document.getElementById('of_prod_list');
+    div.innerHTML = prods.map(p=>{
+      const ex = window._orderItems.find(i=>i.prod_id===p.id);
+      return `<div class="prod-pick-row${ex?' sel':''}" onclick="window._pickProduct('${p.id}')">
+        <div class="pp-info"><div class="pp-name">${p.name}</div>
+        <div class="pp-meta">¥${p.price} · 库存 ${p.stock} ${p.unit||'件'}</div></div>
         <div class="pp-check"></div></div>`;
     }).join('');
-    updateOrderSummary();
+    updateSum();
   }
-  window._pickProduct=function(pid){
-    const idx=window._orderItems.findIndex(i=>i.prodId===pid);
+  window._pickProduct = function(pid){
+    const idx = window._orderItems.findIndex(i=>i.prod_id===pid);
     if(idx>=0){
-      // already selected - prompt to change qty or remove
-      const item=window._orderItems[idx];
-      const qty=prompt(`${prodName(pid)}，当前数量: ${item.qty}。输入新数量（0 为移除）:`,item.qty);
+      const qty = prompt(`${prods.find(p=>p.id===pid)?.name||''}，当前: ${window._orderItems[idx].qty}。新数量(0=移除):`,window._orderItems[idx].qty);
       if(qty===null)return;
-      const n=parseInt(qty)||0;
-      if(n<=0)window._orderItems.splice(idx,1);
-      else item.qty=n;
-    }else{
-      const qty=prompt(`${prodName(pid)}，输入数量:`,1);
+      const n = parseInt(qty)||0;
+      if(n<=0) window._orderItems.splice(idx,1); else window._orderItems[idx].qty=n;
+    } else {
+      const qty = prompt(`${prods.find(p=>p.id===pid)?.name||''}，输入数量:`,1);
       if(qty===null)return;
-      const n=parseInt(qty)||0;
-      if(n>0)window._orderItems.push({prodId:pid,qty:n});
+      const n = parseInt(qty)||0;
+      if(n>0) window._orderItems.push({prod_id:pid,qty:n});
     }
     renderPicker();
   };
-  function updateOrderSummary(){
+  function updateSum(){
     document.getElementById('of_sel_count').textContent=window._orderItems.length;
-    const total=window._orderItems.reduce((s,i)=>s+prodPrice(i.prodId)*i.qty,0);
-    document.getElementById('of_total').textContent='¥'+fmt(total);
+    const total=window._orderItems.reduce((s,i)=>s+(prods.find(p=>p.id===i.prod_id)?.price||0)*i.qty,0);
+    document.getElementById('of_total').textContent='¥'+total.toFixed(2);
   }
   renderPicker();
 }
 
-function saveOrder(){
+async function saveOrder(){
   if(!window._orderItems||!window._orderItems.length)return alert('请选择商品');
-  const order={
-    id:uid(),storeId:document.getElementById('of_store').value,
-    date:document.getElementById('of_date').value,
-    items:[...window._orderItems],status:'pending'
-  };
-  orders.push(order);save('o',orders);
+  const storeId = document.getElementById('of_store').value;
+  const date = document.getElementById('of_date').value;
+  const {data:order} = await sb.from('orders').insert([{
+    store_id: storeId, date, status:'pending', created_by: currentUser.id
+  }]).select().single();
+  if(!order) return alert('创建失败');
+  const items = window._orderItems.map(i=>({order_id:order.id, prod_id:i.prod_id, qty:i.qty}));
+  await sb.from('order_items').insert(items);
   closeModal();
-  document.getElementById('orderDate').value=order.date;
-  renderOrders();refreshDash();
+  document.getElementById('orderDate').value = date;
+  await loadOrders();
 }
-function confirmOrder(id){
-  const o=byId(orders,id);if(o){o.status='confirmed';save('o',orders)}
-  renderOrders();refreshDash();
+async function confirmOrder(id){
+  await sb.from('orders').update({status:'confirmed'}).eq('id',id);
+  await loadOrders();
 }
-function deleteOrder(id){
-  if(!confirm('确定删除该报货单？'))return;
-  orders=orders.filter(o=>o.id!==id);save('o',orders);
-  renderOrders();refreshDash();
+async function deleteOrder(id){
+  if(!confirm('确定删除？'))return;
+  await sb.from('order_items').delete().eq('order_id',id);
+  await sb.from('orders').delete().eq('id',id);
+  await loadOrders();
 }
 
-/* bills (main only) */
-function renderBillFilters(){
-  const vs=stores.filter(s=>s.type==='franchise');
-  document.getElementById('billStoreFilter').innerHTML='<option value="">全部加盟店</option>'+vs.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+/* ============ BILLS ============ */
+async function loadBillFilters(){
+  const {data} = await sb.from('stores').select('*').eq('type','franchise').order('name');
+  document.getElementById('billStoreFilter').innerHTML = '<option value="">全部加盟店</option>'+
+    (data||[]).map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
 }
-function calcBillTotal(bill){
-  let total=0;
-  bill.orderIds.forEach(oid=>{const o=byId(orders,oid);if(o)o.items.forEach(i=>{total+=prodPrice(i.prodId)*i.qty});});
-  return total;
-}
-function renderBills(){
-  const storeFilter=document.getElementById('billStoreFilter').value;
-  const statusFilter=document.getElementById('billStatusFilter').value;
-  const vs=stores.filter(s=>s.type==='franchise').map(s=>s.id);
-  let list=bills.filter(b=>vs.includes(b.storeId));
-  if(storeFilter)list=list.filter(b=>b.storeId===storeFilter);
-  if(statusFilter)list=list.filter(b=>b.status===statusFilter);
-  const div=document.getElementById('billList');
-  if(!list.length){div.innerHTML='<div class="empty"><p>暂无账单</p></div>';return}
-  div.innerHTML=list.map(b=>{
-    const total=calcBillTotal(b);
-    return `<div class="cd" onclick="openBillModal('${b.id}')" style="cursor:pointer">
+async function loadBills(){
+  const sf = document.getElementById('billStoreFilter').value;
+  const ss = document.getElementById('billStatusFilter').value;
+  let query = sb.from('bills').select('*,stores(name)').order('created_at',{ascending:false});
+  if(sf) query = query.eq('store_id',sf);
+  if(ss) query = query.eq('status',ss);
+  const {data} = await query;
+  const div = document.getElementById('billList');
+  if(!data||!data.length){div.innerHTML='<div class="empty"><p>暂无账单</p></div>';return}
+  div.innerHTML = data.map(b=>
+    `<div class="cd" onclick="openBillModal('${b.id}')" style="cursor:pointer">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-size:13px;font-weight:500">${storeName(b.storeId)}</div>
-        <div style="font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:2px">${b.date} · ${b.orderIds.length}单</div></div>
+        <div><div style="font-size:13px;font-weight:500">${b.stores?.name||'未知'}</div>
+        <div style="font-size:10px;color:var(--tx3);font-family:var(--mono);margin-top:2px">${b.date}</div></div>
         <div style="text-align:right">
-        <div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--ac)">¥${fmt(total)}</div>
-        <span class="tag ${b.status==='paid'?'ok':'warn'}" style="margin-top:4px">${b.status==='paid'?'已结':'待结'}</span></div></div></div>`;
-  }).join('');
+        <div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--ac)">¥${(b.total||0).toFixed(2)}</div>
+        <span class="tag ${b.status==='paid'?'ok':'warn'}" style="margin-top:4px">${b.status==='paid'?'已结':'待结'}</span></div></div></div>`
+  ).join('');
 }
-function generateBill(){
-  if(!isMain())return;
-  const vs=stores.filter(s=>s.type==='franchise');
-  if(!vs.length)return alert('没有加盟店');
-  const storeOpts=vs.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
-  let html=`<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal">
+async function generateBill(){
+  const {data:stores} = await sb.from('stores').select('*').eq('type','franchise');
+  if(!stores||!stores.length) return alert('没有加盟店');
+  const storeOpts = stores.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  let html = `<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal">
     <div class="modal-h"><h2>生成供货账单</h2><div class="close" onclick="closeModal()">×</div></div>
     <div class="fg"><label>加盟店</label><select id="bf_store">${storeOpts}</select></div>
     <div class="fg"><label>日期</label><input type="date" id="bf_date" value="${new Date().toISOString().slice(0,10)}"></div>
-    <div id="bf_orders" style="margin-top:8px;max-height:200px;overflow-y:auto"><div style="color:var(--tx3);font-size:12px;text-align:center;padding:12px">请先选择加盟店</div></div>
+    <div id="bf_orders" style="margin-top:8px;max-height:200px;overflow-y:auto"><div style="color:var(--tx3);font-size:12px;text-align:center;padding:12px">请选择加盟店</div></div>
     <div style="text-align:right;font-family:var(--mono);font-size:14px;color:var(--ac);margin:8px 0" id="bf_total">¥0.00</div>
     <button class="btn btn-w block" onclick="saveBill()">生成账单</button></div></div>`;
   showModal(html);
-  window._billOrderIds=[];
-  document.getElementById('bf_store').onchange=function(){
-    const sid=this.value;
-    const confirmedOrders=orders.filter(o=>o.storeId===sid&&o.status==='confirmed');
-    const alreadyInBill=bills.flatMap(b=>b.orderIds);
-    const available=confirmedOrders.filter(o=>!alreadyInBill.includes(o.id));
-    const div=document.getElementById('bf_orders');
-    if(!available.length){div.innerHTML='<div style="color:var(--tx3);font-size:12px;text-align:center;padding:12px">没有可入账的报货单</div>';return}
-    window._billOrderIds=[];
-    div.innerHTML=available.map(o=>{
-      const total=o.items.reduce((s,i)=>s+prodPrice(i.prodId)*i.qty,0);
+  window._billOrderIds = [];
+  document.getElementById('bf_store').onchange = async function(){
+    const sid = this.value;
+    const {data:confirmed} = await sb.from('orders').select('*').eq('store_id',sid).eq('status','confirmed');
+    const {data:allBills} = await sb.from('bills').select('id');
+    const {data:allBO} = await sb.from('bill_orders').select('order_id');
+    const usedIds = new Set((allBO||[]).map(b=>b.order_id));
+    const avail = (confirmed||[]).filter(o=>!usedIds.has(o.id));
+    const div = document.getElementById('bf_orders');
+    if(!avail.length){div.innerHTML='<div style="color:var(--tx3);font-size:12px;text-align:center;padding:12px">没有可入账的报货单</div>';return}
+    window._billOrderIds = [];
+    div.innerHTML = avail.map(o=>{
+      const total = o.total||0;
       return `<div class="oi-row" style="cursor:pointer" onclick="window._billOrderIds=window._billOrderIds.includes('${o.id}')?window._billOrderIds.filter(x=>x!=='${o.id}'):[...window._billOrderIds,'${o.id}'];this.style.background=window._billOrderIds.includes('${o.id}')?'rgba(212,148,58,.1)':'';window._updateBfTotal()">
-        <span class="prod" style="color:var(--tx2)">${o.date} · ${o.items.length}种</span><span class="sub">¥${fmt(total)}</span></div>`;
+        <span class="prod" style="color:var(--tx2)">${o.date}</span><span class="sub">¥${total.toFixed(2)}</span></div>`;
     }).join('');
-    window._updateBfTotal=function(){
-      let total=0;window._billOrderIds.forEach(oid=>{const o=byId(orders,oid);if(o)o.items.forEach(i=>{total+=prodPrice(i.prodId)*i.qty});});
-      document.getElementById('bf_total').textContent='¥'+fmt(total);
+    window._updateBfTotal = ()=>{
+      const t = window._billOrderIds.reduce((s,oid)=>{const o=avail.find(x=>x.id===oid);return s+(o?.total||0)},0);
+      document.getElementById('bf_total').textContent='¥'+t.toFixed(2);
     };
   };
 }
-function saveBill(){
-  if(!window._billOrderIds||!window._billOrderIds.length)return alert('请选择报货单');
-  bills.push({id:uid(),storeId:document.getElementById('bf_store').value,date:document.getElementById('bf_date').value,orderIds:[...window._billOrderIds],status:'pending'});
-  save('b',bills);closeModal();renderBills();refreshDash();
+async function saveBill(){
+  if(!window._billOrderIds||!window._billOrderIds.length) return alert('请选择报货单');
+  const {data:selected} = await sb.from('orders').select('id,total').in('id',window._billOrderIds);
+  const total = (selected||[]).reduce((s,o)=>s+(o.total||0),0);
+  const {data:bill} = await sb.from('bills').insert([{
+    store_id: document.getElementById('bf_store').value,
+    date: document.getElementById('bf_date').value,
+    status:'pending', total, created_by: currentUser.id
+  }]).select().single();
+  if(!bill) return alert('创建失败');
+  const links = window._billOrderIds.map(oid=>({bill_id:bill.id, order_id:oid}));
+  await sb.from('bill_orders').insert(links);
+  closeModal();await loadBills();
 }
-function openBillModal(id){
-  const b=byId(bills,id);if(!b)return;
-  const total=calcBillTotal(b);
-  const orderDetails=b.orderIds.map(oid=>{
-    const o=byId(orders,oid);if(!o)return'';
-    const itemsHtml=o.items.map(i=>`<tr><td>${prodName(i.prodId)}</td><td class="m">${i.qty}</td><td class="m">¥${prodPrice(i.prodId)}</td><td class="m">¥${fmt(prodPrice(i.prodId)*i.qty)}</td></tr>`).join('');
-    return `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">报货日期: ${o.date}</div><table class="tbl"><thead><tr><th>商品</th><th>数量</th><th>单价</th><th>小计</th></tr></thead><tbody>${itemsHtml}</tbody></table></div>`;
+async function openBillModal(id){
+  const {data:b} = await sb.from('bills').select('*,stores(name)').eq('id',id).single();
+  if(!b) return;
+  const {data:links} = await sb.from('bill_orders').select('*').eq('bill_id',id);
+  const oids = (links||[]).map(l=>l.order_id);
+  const {data:orders} = oids.length?await sb.from('orders').select('*').in('id',oids):{data:[]};
+  const {data:items} = oids.length?await sb.from('order_items').select('*').in('order_id',oids):{data:[]};
+  const pids = [...new Set((items||[]).map(i=>i.prod_id))];
+  const {data:prods} = pids.length?await sb.from('products').select('*').in('id',pids):{data:[]};
+  const prodMap={};(prods||[]).forEach(p=>prodMap[p.id]=p);
+
+  const details = (orders||[]).map(o=>{
+    const oi = (items||[]).filter(i=>i.order_id===o.id);
+    const rows = oi.map(i=>`<tr><td>${prodMap[i.prod_id]?.name||''}</td><td class="m">${i.qty}</td><td class="m">¥${(prodMap[i.prod_id]?.price||0).toFixed(2)}</td><td class="m">¥${((prodMap[i.prod_id]?.price||0)*i.qty).toFixed(2)}</td></tr>`).join('');
+    return `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--tx3);margin-bottom:4px">${o.date}</div><table class="tbl"><thead><tr><th>商品</th><th>数量</th><th>单价</th><th>小计</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }).join('');
+
   showModal(`<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal">
     <div class="modal-h"><h2>账单详情</h2><div class="close" onclick="closeModal()">×</div></div>
-    <div style="margin-bottom:12px"><div style="font-size:14px;font-weight:600">${storeName(b.storeId)}</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:2px">${b.date}</div></div>
-    ${orderDetails}
+    <div style="margin-bottom:12px"><div style="font-size:14px;font-weight:600">${b.stores?.name||''}</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:2px">${b.date}</div></div>
+    ${details}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)">
-      <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ac)">¥${fmt(total)}</span>
+      <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ac)">¥${(b.total||0).toFixed(2)}</span>
       <span class="tag ${b.status==='paid'?'ok':'warn'}">${b.status==='paid'?'已结':'待结'}</span></div>
     <div style="display:flex;gap:8px;margin-top:16px">
       ${b.status==='pending'?`<button class="btn btn-w block" onclick="markBillPaid('${b.id}')">标记已结</button>`:''}
       <button class="btn btn-d block" onclick="deleteBill('${b.id}')">删除</button></div></div></div>`);
 }
-function markBillPaid(id){const b=byId(bills,id);if(b){b.status='paid';save('b',bills)}closeModal();renderBills();refreshDash();}
-function deleteBill(id){if(!confirm('确定删除？'))return;bills=bills.filter(b=>b.id!==id);save('b',bills);closeModal();renderBills();refreshDash();}
+async function markBillPaid(id){
+  await sb.from('bills').update({status:'paid'}).eq('id',id);
+  closeModal();await loadBills();
+}
+async function deleteBill(id){
+  if(!confirm('确定删除？'))return;
+  await sb.from('bill_orders').delete().eq('bill_id',id);
+  await sb.from('bills').delete().eq('id',id);
+  closeModal();await loadBills();
+}
 
-/* modal helpers */
+/* ============ MODAL ============ */
 function showModal(html){document.getElementById('modalContainer').innerHTML=html;document.body.style.overflow='hidden'}
 function closeModal(){document.getElementById('modalContainer').innerHTML='';document.body.style.overflow=''}
 
 /* init */
-document.getElementById('orderDate').value=new Date().toISOString().slice(0,10);
-
-// check if already logged in from previous session
-const savedRole=load('role','');
-if(savedRole){
-  if(savedRole==='main')loginAs('main');
-  else if(stores.find(s=>s.id===savedRole&&s.type==='branch'))loginAs(savedRole);
-}
-
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+document.getElementById('orderDate').value = new Date().toISOString().slice(0,10);
 </script>
 </body>
 </html>
