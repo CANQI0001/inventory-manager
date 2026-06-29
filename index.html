@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0a0c14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="进销存">
@@ -12,9 +12,9 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f5f5f7;--srf:#ffffff;--crd:#ffffff;--bdr:#e5e5ea;
-  --tx:#1c1c1e;--tx2:#6e6e73;--tx3:#aeaeb2;
-  --ac:#d4943a;--ac2:#b87a2a;--gr:#34c759;--rd:#ff3b30;--bl:#007aff;
+  --bg:#0a0c14;--srf:#141725;--crd:#1a1e2e;--bdr:#252a3a;
+  --tx:#e2e4eb;--tx2:#888ca0;--tx3:#5a5e70;
+  --ac:#d4943a;--ac2:#b87a2a;--gr:#4a9e6c;--rd:#c54a4a;
   --mono:'JetBrains Mono',monospace;--r:8px;--rs:5px;
   --btn-w:#ffffff;--btn-b:#d0e4f7;--btn-b2:#a8cce8;
   --nav:60px;--hd:50px;
@@ -46,7 +46,7 @@ body{
   width:100%;max-width:640px;height:var(--nav);
   background:var(--srf);border-top:1px solid var(--bdr);
   display:flex;z-index:100;border-radius:14px 14px 0 0;
-  box-shadow:0 -2px 12px rgba(0,0,0,.08);padding:0 6px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.45);padding:0 6px;
 }
 #nav .t{
   flex:1;display:flex;flex-direction:column;align-items:center;
@@ -61,19 +61,19 @@ body{
 .hd{
   position:sticky;top:0;z-index:50;display:flex;align-items:center;
   justify-content:space-between;height:var(--hd);padding:0 2px;
-  background:var(--bg);border-bottom:1px solid var(--bdr);
+  background:var(--bg);
 }
 .hd h1{font-size:17px;font-weight:600;letter-spacing:-.3px}
 .hd .role{
   font-size:11px;padding:4px 12px;border-radius:20px;
-  background:#f5f5f7;border:1px solid var(--bdr);
+  background:var(--crd);border:1px solid var(--bdr);
   color:var(--ac);cursor:pointer;font-family:var(--mono);font-weight:500;
 }
 
 /* cards */
 .cd{
   background:var(--crd);border-radius:var(--r);padding:14px;
-  margin-bottom:10px;border:1px solid var(--bdr);box-shadow:0 1px 3px rgba(0,0,0,.04);
+  margin-bottom:10px;border:1px solid var(--bdr);
 }
 .cd-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .cd-h span{font-size:13px;font-weight:600;color:var(--tx)}
@@ -83,7 +83,7 @@ body{
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .st{
   background:var(--crd);border-radius:var(--r);padding:12px;
-  border:1px solid var(--bdr);box-shadow:0 1px 2px rgba(0,0,0,.04);
+  border:1px solid var(--bdr);
 }
 .st .v{font-size:22px;font-weight:700;font-family:var(--mono);color:var(--ac)}
 .st .l{font-size:10px;color:var(--tx3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
@@ -100,7 +100,7 @@ body{
 .fg{margin-bottom:10px}
 .fg label{display:block;font-size:10px;color:var(--tx3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
 .fg input,.fg select,.fg textarea{
-  width:100%;padding:9px 12px;background:#f5f5f7;border:1px solid var(--bdr);
+  width:100%;padding:9px 12px;background:var(--srf);border:1px solid var(--bdr);
   border-radius:var(--rs);color:var(--tx);font-size:14px;font-family:inherit;
   outline:none;transition:border-color .15s;
 }
@@ -128,10 +128,10 @@ body{
 /* role select cards */
 .role-card{
   display:block;width:100%;padding:16px;border-radius:var(--r);
-  border:1px solid var(--bdr);background:#f5f5f7;cursor:pointer;
+  border:1px solid var(--bdr);background:var(--srf);cursor:pointer;
   margin-bottom:10px;transition:all .15s;text-align:left;color:var(--tx);
 }
-.role-card:active,.role-card:hover{border-color:var(--ac);background:#f0f0f3}
+.role-card:active,.role-card:hover{border-color:var(--ac);background:var(--crd)}
 .role-card .rc-icon{font-size:24px;margin-bottom:6px}
 .role-card .rc-title{font-size:15px;font-weight:600;margin-bottom:3px}
 .role-card .rc-desc{font-size:11px;color:var(--tx2)}
@@ -169,14 +169,14 @@ body{
   display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;
   font-weight:500;font-family:var(--mono);
 }
-.tag.warn{background:rgba(212,148,58,.1);color:var(--ac)}
-.tag.ok{background:rgba(52,199,89,.1);color:var(--gr)}
-.tag.err{background:rgba(255,59,48,.1);color:var(--rd)}
-.tag.info{background:rgba(0,122,255,.1);color:var(--bl)}
+.tag.warn{background:rgba(212,148,58,.15);color:var(--ac)}
+.tag.ok{background:rgba(74,158,108,.15);color:var(--gr)}
+.tag.err{background:rgba(197,74,74,.15);color:var(--rd)}
+.tag.info{background:rgba(91,140,201,.15);color:var(--bl)}
 
 /* modal */
 .modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
   display:flex;align-items:flex-end;justify-content:center;
 }
 .modal{
@@ -186,7 +186,7 @@ body{
 .modal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .modal-h h2{font-size:16px;font-weight:600}
 .modal-h .close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;
-  border-radius:50%;background:#f5f5f7;cursor:pointer;color:var(--tx3);font-size:18px;
+  border-radius:50%;background:var(--crd);cursor:pointer;color:var(--tx3);font-size:18px;
   -webkit-tap-highlight-color:transparent}
 
 /* empty */
@@ -252,7 +252,7 @@ body{
 <div class="page" id="pg_products">
   <div id="prod_header" class="flex between acenter mb8">
     <input placeholder="搜索商品..." id="prodSearch" oninput="renderProducts()"
-      style="flex:1;padding:10px 12px;background:#f5f5f7;border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none">
+      style="flex:1;padding:10px 12px;background:var(--crd);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none">
     <button class="btn btn-b sm" style="margin-left:8px;white-space:nowrap" id="prodAddBtn" onclick="openProductModal()">+ 添加</button>
   </div>
   <div id="prodList"></div>
@@ -271,7 +271,7 @@ body{
 <div class="page" id="pg_orders">
   <div class="flex acenter gap8 mb8">
     <input type="date" id="orderDate" onchange="renderOrders()"
-      style="flex:1;padding:10px 12px;background:#f5f5f7;border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)">
+      style="flex:1;padding:10px 12px;background:var(--crd);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)">
     <button class="btn btn-w sm" style="white-space:nowrap" onclick="openOrderModal()">+ 报货单</button>
   </div>
   <div id="orderList"></div>
@@ -281,9 +281,9 @@ body{
 <div class="page" id="pg_bills">
   <div class="flex acenter gap8 mb8">
     <select id="billStoreFilter" onchange="renderBills()"
-      style="flex:1;padding:10px 12px;background:#f5f5f7;border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none"></select>
+      style="flex:1;padding:10px 12px;background:var(--crd);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none"></select>
     <select id="billStatusFilter" onchange="renderBills()"
-      style="padding:10px 12px;background:#f5f5f7;border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none;width:100px">
+      style="padding:10px 12px;background:var(--crd);border:1px solid var(--bdr);border-radius:var(--rs);color:var(--tx);font-size:13px;outline:none;width:100px">
       <option value="">全部</option><option value="pending">待结</option><option value="paid">已结</option></select>
   </div>
   <div id="billList"></div>
@@ -292,13 +292,20 @@ body{
 
 </div><!-- end main_wrap -->
 
-<!-- ═══════════ NAV ═══════════ -->
-<nav id="nav">
+<!-- ═══════════ NAV (总店) ═══════════ -->
+<nav id="nav_main">
   <div class="t ac" onclick="switchTab(0)" id="nav0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>概览</span></div>
   <div class="t" onclick="switchTab(1)" id="nav1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>商品</span></div>
   <div class="t" onclick="switchTab(2)" id="nav2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>店铺</span></div>
   <div class="t" onclick="switchTab(3)" id="nav3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>报货</span></div>
   <div class="t" onclick="switchTab(4)" id="nav4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg><span>账单</span></div>
+</nav>
+
+<!-- ═══════════ NAV (分店) ═══════════ -->
+<nav id="nav_branch" style="display:none">
+  <div class="t ac" onclick="switchTab(0)" id="navb0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>概览</span></div>
+  <div class="t" onclick="switchTab(1)" id="navb1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>商品</span></div>
+  <div class="t" onclick="switchTab(3)" id="navb3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>报货</span></div>
 </nav>
 
 <!-- ═══════════ MODAL CONTAINER ═══════════ -->
@@ -389,12 +396,13 @@ function loginAs(role){
   document.getElementById('pg_login').classList.remove('v');
   document.getElementById('pg_main_wrap').classList.add('v');
   const isM=isMain();
-  document.getElementById('nav').style.display='flex';
+  document.getElementById('nav_main').style.display=isM?'flex':'none';
+  document.getElementById('nav_branch').style.display=isM?'none':'flex';
   document.getElementById('roleBadge').textContent=isM?'总店':'分店';
   // show/hide tabs
-  document.getElementById('pg_stores').style.display='';
-  document.getElementById('pg_bills').style.display='';
-  document.getElementById('dash_bills_box').style.display='';
+  document.getElementById('pg_stores').style.display=isM?'':'none';
+  document.getElementById('pg_bills').style.display=isM?'':'none';
+  document.getElementById('dash_bills_box').style.display=isM?'':'none';
   document.getElementById('prodAddBtn').style.display=isM?'inline-flex':'none';
   setupTabs();
   switchTab(0);
@@ -424,13 +432,19 @@ function goBackLogin(){
   save('role','');
   document.getElementById('pg_login').classList.add('v');
   document.getElementById('pg_main_wrap').classList.remove('v');
-  document.getElementById('nav').style.display='flex';
+  document.getElementById('nav_main').style.display='flex';
+  document.getElementById('nav_branch').style.display='none';
 }
 
 function setupTabs(){
-  const tabs=document.querySelectorAll('#nav .t');
-  tabs.forEach(t=>t.classList.remove('ac'));
-  tabs[0].classList.add('ac');
+  const isM=isMain();
+  const mainTabs=document.querySelectorAll('#nav_main .t');
+  const branchTabs=document.querySelectorAll('#nav_branch .t');
+  // reset all
+  mainTabs.forEach(t=>t.classList.remove('ac'));
+  branchTabs.forEach(t=>t.classList.remove('ac'));
+  mainTabs[0].classList.add('ac');
+  branchTabs[0].classList.add('ac');
 }
 
 const titles_main=['仪表盘','商品管理','店铺管理','报货单','供货账单'];
@@ -445,8 +459,20 @@ function switchTab(idx){
   if(pageId)document.getElementById(pageId).classList.add('v');
   document.getElementById('pageTitle').textContent=isM?titles_main[idx]:titles_branch[idx];
   // nav active
-  const tabs=document.querySelectorAll('#nav .t');
-  tabs.forEach((t,i)=>{t.classList.toggle('ac',i===idx)});
+  const navPrefix=isM?'nav':'navb';
+  const maxTab=isM?5:4;
+  for(let i=0;i<maxTab;i++){
+    const el=document.getElementById(navPrefix+i);
+    if(el)el.classList.toggle('ac',i===idx||(isM?false:i===idx));
+  }
+  // branch nav: map tab 1->0, tab 3->1
+  if(!isM){
+    const btabs=document.querySelectorAll('#nav_branch .t');
+    btabs.forEach((t,i)=>{t.classList.remove('ac')});
+    if(idx===0&&btabs[0])btabs[0].classList.add('ac');
+    if(idx===1&&btabs[1])btabs[1].classList.add('ac');
+    if(idx===3&&btabs[2])btabs[2].classList.add('ac');
+  }
   refreshTab(idx);
   window.scrollTo(0,0);
 }
@@ -454,18 +480,12 @@ function switchTab(idx){
 function refreshTab(idx){
   if(idx===0)refreshDash();
   if(idx===1)renderProducts();
-  if(idx===2){
-    if(isMain())renderStores();
-    else document.getElementById('storeList').innerHTML='<div class="empty"><p>分店无店铺管理权限</p></div>';
-  }
+  if(idx===2&&isMain())renderStores();
   if(idx===3){
     document.getElementById('orderDate').value=new Date().toISOString().slice(0,10);
     renderOrders();
   }
-  if(idx===4){
-    if(isMain()){renderBillFilters();renderBills();}
-    else document.getElementById('billList').innerHTML='<div class="empty"><p>分店无供货账单权限</p></div>';
-  }
+  if(idx===4&&isMain()){renderBillFilters();renderBills();}
 }
 
 /* dashboard */
@@ -514,8 +534,7 @@ function refreshDash(){
       }).join('');
     }
   }else{
-    document.getElementById('dash_recent_bills').innerHTML='<div class="empty"><p>分店暂无账单数据</p></div>';
-    document.getElementById('dash_bills_link').textContent='';
+    document.getElementById('dash_bills_box').style.display='none';
   }
 }
 
