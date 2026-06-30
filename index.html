@@ -120,9 +120,10 @@ function renderAuth(){
 }
 function enterApp(role){
  profile={id:'test_'+Math.random().toString(36).slice(2,10),role:role,display_name:role==='main'?'总店测试':'分店测试'};
+ localStorage.setItem('iv_profile',JSON.stringify(profile));
  showMain();
 }
-function doLogout(){profile=null;showAuth();}
+function doLogout(){localStorage.removeItem('iv_profile');profile=null;showAuth();}
 function showAuth(){document.getElementById('pg_auth').classList.add('v');document.getElementById('pg_main').classList.remove('v');document.getElementById('nav').style.display='none';renderAuth();}
 function showMain(){document.getElementById('pg_auth').classList.remove('v');document.getElementById('pg_main').classList.add('v');document.getElementById('nav').style.display='flex';var m=profile.role==='main';document.getElementById('roleBadge').textContent=m?'总店':'分店';switchTab(0);}
 
@@ -283,7 +284,11 @@ function saveOrder(){
   });
  });
 }
-function confirmOrder(id){Q('orders').update({status:'confirmed'}).eq('id',id).then(function(){renderOrders();});}
+function confirmOrder(id){
+ var pw=prompt('请输入确认密码：');
+ if(pw!=='888888'){if(pw!==null)alert('密码错误');return;}
+ Q('orders').update({status:'confirmed'}).eq('id',id).then(function(){renderOrders();});
+}
 function deleteOrder(id){if(!confirm('确定删除？'))return;Q('order_items').del().eq('order_id',id).then(function(){Q('orders').del().eq('id',id).then(function(){renderOrders();});});}
 
 /* ============ BILLS ============ */
@@ -363,7 +368,13 @@ function closeModal(){document.getElementById('modalContainer').innerHTML='';doc
 
 /* ============ BOOT ============ */
 (function(){
- renderAuth();
+ var saved=localStorage.getItem('iv_profile');
+ if(saved){
+  profile=JSON.parse(saved);
+  showMain();
+ }else{
+  renderAuth();
+ }
 })();
 </script>
 </body>
