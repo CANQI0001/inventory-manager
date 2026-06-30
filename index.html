@@ -51,12 +51,12 @@ table.tbl th{color:var(--tx3);font-weight:500;font-size:10px}
 <div class="page v" id="pg_auth">
   <div class="auth-wrap">
     <div class="logo">进销存管理</div>
-    <div class="sub">多店进销存 · 账号登录</div>
+    <div class="sub">测试模式 · 选择身份进入</div>
     <div class="auth-card" id="authCard"></div>
   </div>
 </div>
 <div class="page" id="pg_main">
-  <div class="hd"><h1 id="pageTitle">仪表盘</h1><div class="right"><span class="role" id="roleBadge"></span><span class="logout-btn" onclick="doLogout()">退出</span></div></div>
+  <div class="hd"><h1 id="pageTitle">仪表盘</h1><div class="right"><span class="role" id="roleBadge"></span><span class="logout-btn" onclick="doLogout()">切换</span></div></div>
   <div class="page v" id="pg_dash"><div class="stats" id="dash_stats"></div><div class="cd"><div class="cd-h"><span>低库存预警</span></div><div id="dash_low"></div></div><div class="cd" id="dash_bills_box"><div class="cd-h"><span>近期账单</span></div><div id="dash_bills"></div></div></div>
   <div class="page" id="pg_products"><div class="flex between acenter mb8"><input placeholder="搜索商品..." id="prodSearch" oninput="renderProducts()" style="flex:1;padding:10px 12px;background:#f5f5f7;border:1px solid var(--bdr);border-radius:5px;color:var(--tx);font-size:13px;outline:none"><button class="btn btn-b sm" id="prodAddBtn" onclick="openProductModal()">+ 添加</button></div><div id="prodList"></div></div>
   <div class="page" id="pg_stores"><div class="flex between acenter mb8"><span style="font-size:13px;color:var(--tx2)" id="storeCount"></span><button class="btn btn-b sm" onclick="openStoreModal()">+ 添加</button></div><div id="storeList"></div></div>
@@ -77,9 +77,9 @@ table.tbl th{color:var(--tx3);font-weight:500;font-size:10px}
 /* ============ REST Client ============ */
 var SB_URL='https://ldtjjrnvniirfrnmtfbd.supabase.co';
 var SB_KEY='sb_publishable_NaiTMvOQ-Zgd0g3RMxU8XQ_0ELa_fsi';
-var accessToken=null,profile=null,currentTab=0;
+var profile=null,currentTab=0;
 
-function rh(){var h={apikey:SB_KEY,'Content-Type':'application/json'};if(accessToken)h.Authorization='Bearer '+accessToken;return h;}
+function rh(){return {apikey:SB_KEY,'Content-Type':'application/json'};}
 
 function Q(table){var self={
  _t:table,_m:'GET',_qs:'',_b:null,
@@ -109,52 +109,22 @@ function Q(table){var self={
  }
 };return self;}
 
-function A(){return{
- signUp:function(d){return fetch(SB_URL+'/auth/v1/signup',{method:'POST',headers:rh(),body:JSON.stringify(d)}).then(function(r){return r.json();});},
- signIn:function(d){return fetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:rh(),body:JSON.stringify(d)}).then(function(r){return r.json();});},
- logout:function(){localStorage.removeItem('sb_token');localStorage.removeItem('sb_user');accessToken=null;profile=null;showAuth();}
-};}
-
 /* ============ AUTH ============ */
-function renderAuth(mode){
- var isLogin=mode==='login';
+function renderAuth(){
  document.getElementById('authCard').innerHTML=
-  '<div style="display:flex;margin-bottom:16px">'+
-  '<div style="flex:1;text-align:center;padding:8px;font-size:15px;font-weight:600;cursor:pointer;border-bottom:2px solid '+(isLogin?'var(--ac)':'var(--bdr)')+';color:'+(isLogin?'var(--tx)':'var(--tx3)')+'" onclick="renderAuth(\'login\')">登录</div>'+
-  '<div style="flex:1;text-align:center;padding:8px;font-size:15px;font-weight:600;cursor:pointer;border-bottom:2px solid '+(!isLogin?'var(--ac)':'var(--bdr)')+';color:'+(!isLogin?'var(--tx)':'var(--tx3)')+'" onclick="renderAuth(\'register\')">注册</div></div>'+
-  '<div class="fg"><label>邮箱</label><input type="email" id="af_email" placeholder="your@email.com"></div>'+
-  '<div class="fg"><label>密码 (6位以上)</label><input type="password" id="af_pw" placeholder="······"></div>'+
-  '<div class="err" id="af_err"></div>'+
-  '<button class="btn btn-w block mt8" onclick="doAuth(\''+mode+'\')">'+(isLogin?'登录':'注册')+'</button>';
+  '<div style="text-align:center;padding:8px 0"><div style="font-size:13px;color:var(--tx2);margin-bottom:16px">当前测试模式，选择身份即可进入</div>'+
+  '<button class="btn btn-w block" style="margin-bottom:8px;font-size:16px;padding:14px" onclick="enterApp(\'main\')">总店 · 全部权限</button>'+
+  '<button class="btn btn-b block" style="font-size:16px;padding:14px" onclick="enterApp(\'franchise\')">分店 · 报货权限</button>'+
+  '<div style="font-size:10px;color:var(--tx3);margin-top:12px">随机ID: <span style="font-family:monospace" id="randId"></span></div></div>';
+ document.getElementById('randId').textContent='#'+Math.random().toString(36).slice(2,10).toUpperCase();
 }
-function doAuth(mode){
- var em=document.getElementById('af_email').value.trim(),pw=document.getElementById('af_pw').value,err=document.getElementById('af_err');
- err.textContent='';err.className='err';
- if(!em||!pw){err.textContent='请填写邮箱和密码';return;}
- if(pw.length<6){err.textContent='密码至少6位';return;}
- if(mode==='login'){
-  A().signIn({email:em,password:pw}).then(function(r){
-   if(r.error){err.textContent=r.error_description||r.error.message||'登录失败';return;}
-   accessToken=r.access_token;localStorage.setItem('sb_token',accessToken);
-   localStorage.setItem('sb_user',JSON.stringify(r.user));loadProfile(r.user);
-  });
- }else{
-  A().signUp({email:em,password:pw}).then(function(r){
-   if(r.error){err.textContent=r.error_description||r.error.message||'注册失败';return;}
-   err.className='ok';err.textContent='注册成功！请切换到登录页登录';
-  });
- }
+function enterApp(role){
+ profile={id:'test_'+Math.random().toString(36).slice(2,10),role:role,display_name:role==='main'?'总店测试':'分店测试'};
+ showMain();
 }
-function doLogout(){A().logout();}
-function loadProfile(u){
- Q('profiles').select('*').eq('id',u.id).then(function(r){
-  profile=r.data||{id:u.id,role:'franchise'};
-  if(!r.data){Q('profiles').up({id:u.id,role:'franchise',display_name:u.email}).then(function(){profile={id:u.id,role:'franchise'};showMain();});}
-  else showMain();
- });
-}
-function showAuth(){document.getElementById('pg_auth').classList.add('v');document.getElementById('pg_main').classList.remove('v');document.getElementById('nav').style.display='none';renderAuth('login');}
-function showMain(){document.getElementById('pg_auth').classList.remove('v');document.getElementById('pg_main').classList.add('v');document.getElementById('nav').style.display='flex';var m=profile.role==='main';document.getElementById('roleBadge').textContent=m?'总店':'分店';document.getElementById('nav2').style.display=m?'flex':'none';document.getElementById('nav4').style.display=m?'flex':'none';document.getElementById('prodAddBtn').style.display=m?'inline-flex':'none';switchTab(0);}
+function doLogout(){profile=null;showAuth();}
+function showAuth(){document.getElementById('pg_auth').classList.add('v');document.getElementById('pg_main').classList.remove('v');document.getElementById('nav').style.display='none';renderAuth();}
+function showMain(){document.getElementById('pg_auth').classList.remove('v');document.getElementById('pg_main').classList.add('v');document.getElementById('nav').style.display='flex';var m=profile.role==='main';document.getElementById('roleBadge').textContent=m?'总店':'分店';switchTab(0);}
 
 function switchTab(idx){
  if(!profile)return;var m=profile.role==='main';if(!m&&(idx===2||idx===4))return;currentTab=idx;
@@ -393,17 +363,7 @@ function closeModal(){document.getElementById('modalContainer').innerHTML='';doc
 
 /* ============ BOOT ============ */
 (function(){
- var t=localStorage.getItem('sb_token'),u=localStorage.getItem('sb_user');
- if(t&&u){
-  accessToken=t;var pu=JSON.parse(u);
-  if(pu&&pu.id){
-   Q('profiles').select('*').eq('id',pu.id).then(function(r){
-    profile=r.data||{id:pu.id,role:'franchise'};
-    if(!r.data){Q('profiles').up({id:pu.id,role:'franchise',display_name:pu.email||''}).then(function(){profile={id:pu.id,role:'franchise'};showMain();});}
-    else showMain();
-   });
-  }else showAuth();
- }else showAuth();
+ renderAuth();
 })();
 </script>
 </body>
